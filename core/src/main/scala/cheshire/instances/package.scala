@@ -1,7 +1,6 @@
 package cheshire
 
-import scala.{Boolean, Function1, Int, None, Option, Predef, Some, Unit}
-import scala.Predef.{booleanWrapper}
+import scala.{Boolean, Function1, Int, Long, None, Option, Predef, Some, Unit}
 
 package object instances {
   implicit val function1Category: Category[Function1] =
@@ -14,14 +13,13 @@ package object instances {
         }
     }
 
-  implicit val booleanRing
-      : category.set.Ring[Boolean] =
-    new category.set.Ring[Boolean] {
-      def additive = new category.set.CommutativeGroup[Boolean] {
+  implicit val booleanRig
+      : category.set.Rig[Boolean] =
+    new category.set.Rig[Boolean] {
+      def additive = new category.set.CommutativeMonoid[Boolean] {
         def identity = (_: Unit) => false
-        def op = (p: (Boolean, Boolean)) => (p._1 && !p._2) || (!p._1 && p._2)
-        def le = (p: (Boolean, Boolean)) => p._1 <= p._2
-        def inverse = (! _)
+        def op = (p: (Boolean, Boolean)) => p._1 || p._2
+        def le = (p: (Boolean, Boolean)) => if (p._1) p._2 else true
       }
       def multiplicative = new category.set.Monoid[Boolean] {
         def identity = (_: Unit) => true
@@ -29,18 +27,39 @@ package object instances {
       }
     }
 
-  implicit val intRing
-      : category.set.Ring[Int] =
-    new category.set.Ring[Int] {
+  implicit val intCommutativeRing
+      : category.set.CommutativeRing[Int] =
+    new category.set.CommutativeRing[Int] {
       def additive = new category.set.CommutativeGroup[Int] {
         def identity = (_: Unit) => 0
         def op = (p: (Int, Int)) => p._1 + p._2
         def le = (p: (Int, Int)) => p._1 <= p._2
         def inverse = (- _)
+        def leftQuotient = (p: (Int, Int)) => op((inverse(p._1), p._2))
+        def rightQuotient = (p: (Int, Int)) => op((p._1, inverse(p._2)))
       }
-      def multiplicative = new category.set.Monoid[Int] {
+      def multiplicative = new category.set.CommutativeMonoid[Int] {
         def identity = (_: Unit) => 1
         def op = (p: (Int, Int)) => p._1 * p._2
+        def le = (p: (Int, Int)) => p._1 <= p._2
+      }
+    }
+
+  implicit val longCommutativeRing
+      : category.set.CommutativeRing[Long] =
+    new category.set.CommutativeRing[Long] {
+      def additive = new category.set.CommutativeGroup[Long] {
+        def identity = (_: Unit) => 0
+        def op = (p: (Long, Long)) => p._1 + p._2
+        def le = (p: (Long, Long)) => p._1 <= p._2
+        def inverse = (- _)
+        def leftQuotient = (p: (Long, Long)) => op((inverse(p._1), p._2))
+        def rightQuotient = (p: (Long, Long)) => op((p._1, inverse(p._2)))
+      }
+      def multiplicative = new category.set.CommutativeMonoid[Long] {
+        def identity = (_: Unit) => 1
+        def op = (p: (Long, Long)) => p._1 * p._2
+        def le = (p: (Long, Long)) => p._1 <= p._2
       }
     }
 

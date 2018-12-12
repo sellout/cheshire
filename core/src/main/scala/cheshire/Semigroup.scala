@@ -11,6 +11,10 @@ trait Semigroup[⟶[_ <: AnyKind, _ <: AnyKind], ⊗ <: AnyKind, M <: AnyKind] {
   def op: ⊗ ⟶ M
 }
 
+trait CommutativeSemigroup
+  [⟶[_ <: AnyKind, _ <: AnyKind], ⊗ <: AnyKind, M <: AnyKind]
+    extends Semigroup[⟶, ⊗, M]
+
 /** A semigroup in the category of endofunctors in *Skal*.
   *
   * *NB*: This is different from [[cats.SemigroupK]]. That is simply a

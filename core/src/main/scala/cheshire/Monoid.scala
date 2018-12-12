@@ -1,6 +1,6 @@
 package cheshire
 
-import scala.{AnyKind}
+import scala.{AnyKind, Boolean}
 
 /** The `⊗` must be constructed with a pair of `M`. E.g., one may pass `(M, M)`
   * for monoids in *Scal*, or `Compose[M, M, ?]` for monads, but kind
@@ -12,6 +12,17 @@ trait Monoid
     extends Semigroup[⟶, ⊗, M] {
 
   def identity: I ⟶ M
+}
+
+trait CommutativeMonoid [⟶[_, _], I, ⊗, M]
+    extends CommutativeSemigroup[⟶, ⊗, M]
+    with Monoid[⟶, I, ⊗, M] {
+
+  /** A commutative monoid induces a preorder. Note that this is weaker than
+    * even a partial order – not only may both `x ≤ y` _and_ `y ≤ x` be false,
+    * but when both are true, it does _not_ imply that `x == y`.
+    */
+  def le: ⊗ ⟶ Boolean
 }
 
 trait MonoidK

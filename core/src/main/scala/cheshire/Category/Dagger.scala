@@ -7,7 +7,7 @@ import scala.{AnyKind}
   */
 final case class DaggerCategory
   [⟶[_ <: AnyKind, _ <: AnyKind], A <: AnyKind, B <: AnyKind]
-  (arrow: A ⟶ B, opArrow: A ⟶ B)
+  (arrow: A ⟶ B, opArrow: B ⟶ A)
 
 object DaggerCategory {
   implicit def category[⟶[_ <: AnyKind, _ <: AnyKind]]

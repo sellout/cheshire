@@ -16,6 +16,12 @@ final class CartesianSetLaws[A: Arbitrary]
       ("associative", forAll { (a: A, b: A, c: A) =>
         A.op((A.op((a, b)), c)) == A.op((a, A.op((b, c))))
       })))
+  def commutativeSemigroup
+    (implicit A: cheshire.category.set.CommutativeSemigroup[A]) =
+    commutativeSemigroupSkeleton(List(
+      ("commutative", forAll { (a: A, b: A) =>
+        A.op((a, b)) == A.op((b, a))
+      })))
   def monoid(implicit A: cheshire.category.set.Monoid[A]) =
     monoidSkeleton(List(
       ("left identity", forAll { (a: A) =>
@@ -23,12 +29,6 @@ final class CartesianSetLaws[A: Arbitrary]
       }),
       ("right identity", forAll { (a: A) =>
         A.op((A.identity(()), a)) == a
-      })))
-  def commutativeSemigroup
-    (implicit A: cheshire.category.set.CommutativeSemigroup[A]) =
-    commutativeSemigroupSkeleton(List(
-      ("commutative", forAll { (a: A, b: A) =>
-        A.op((a, b)) == A.op((b, a))
       })))
   def group(implicit A: cheshire.category.set.Group[A]) =
     groupSkeleton(List(
@@ -54,6 +54,12 @@ final class CartesianSetLaws[A: Arbitrary]
         // && (A.multiplicative.op((x, A.additive.identity(())))
         //     == A.additive.identity(()))
       })))
+  def ring(implicit A: cheshire.category.set.Ring[A]) =
+    ringSkeleton(List())
+  def commutativeRing(implicit A: cheshire.category.set.CommutativeRing[A]) =
+    commutativeRingSkeleton(List())
+  def divisionRing(implicit A: cheshire.category.set.DivisionRing[A]) =
+    divisionRingSkeleton(List())
 }
 
 
@@ -109,6 +115,14 @@ trait MonoidalCategoryLaws
     }
   def group(implicit A: Group[⟶, I, ⊗, A]): RuleSet
 
+  def commutativeGroup(implicit A: CommutativeGroup[⟶, I, ⊗, A]) =
+    new RuleSet {
+      def name = "group"
+      def parents = List(commutativeMonoid, group)
+      def bases = Nil
+      def props = Nil
+    }
+
   def semiringSkeleton
     (properties: List[(String, Prop)])
     (implicit A: Semiring[⟶, I, ⊗, A]) =
@@ -134,4 +148,43 @@ trait MonoidalCategoryLaws
       def props = properties
     }
   def rig(implicit A: Rig[⟶, I, ⊗, A]): RuleSet
+
+  def ringSkeleton
+    (properties: List[(String, Prop)])
+    (implicit A: Ring[⟶, I, ⊗, A]) =
+    new RuleSet {
+      def name = "ring"
+      def parents = List(rig)
+      def bases = List(
+        ("additive",       commutativeGroup(A.additive)),
+        ("multiplicative", monoid(A.multiplicative)))
+      def props = properties
+    }
+  def ring(implicit A: Ring[⟶, I, ⊗, A]): RuleSet
+
+  def commutativeRingSkeleton
+    (properties: List[(String, Prop)])
+    (implicit A: CommutativeRing[⟶, I, ⊗, A]) =
+    new RuleSet {
+      def name = "commutativeRing"
+      def parents = List(ring)
+      def bases = List(
+        ("additive",       commutativeGroup(A.additive)),
+        ("multiplicative", commutativeMonoid(A.multiplicative)))
+      def props = properties
+    }
+  def commutativeRing(implicit A: CommutativeRing[⟶, I, ⊗, A]): RuleSet
+
+  def divisionRingSkeleton
+    (properties: List[(String, Prop)])
+    (implicit A: DivisionRing[⟶, I, ⊗, A]) =
+    new RuleSet {
+      def name = "divisionRing"
+      def parents = List(ring)
+      def bases = List(
+        ("additive",       commutativeGroup(A.additive)),
+        ("multiplicative", group(A.multiplicative)))
+      def props = properties
+    }
+  def divisionRing(implicit A: DivisionRing[⟶, I, ⊗, A]): RuleSet
 }
