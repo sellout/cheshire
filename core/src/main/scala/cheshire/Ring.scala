@@ -1,27 +1,21 @@
 package cheshire
 
-import scala.{AnyKind}
+import cheshire.category._
 
-trait Ring
-  [⟶[_ <: AnyKind, _ <: AnyKind], I <: AnyKind, ⊗ <: AnyKind, M <: AnyKind]
-    extends Rig[⟶, I, ⊗, M] {
-  def additive: CommutativeGroup[⟶, I, ⊗, M]
-  def multiplicative: Monoid[⟶, I, ⊗, M]
+trait Ring[C <: TMonoidalCategory, M] extends Rig[C, M] {
+  def additive: CommutativeGroup[C, M]
+  def multiplicative: Monoid[C, M]
 
-  def negate: M ⟶ M = additive.inverse
-  def subtract: ⊗ ⟶ M = additive.quotient
+  def negate: C#Arrow[M, M] = additive.inverse
+  def subtract: C#Arrow[C#Product[M, M], M] = additive.quotient
 }
 
-trait CommutativeRing
-  [⟶[_ <: AnyKind, _ <: AnyKind], I <: AnyKind, ⊗ <: AnyKind, M <: AnyKind]
-    extends Ring[⟶, I, ⊗, M] {
-  def multiplicative: CommutativeMonoid[⟶, I, ⊗, M]
+trait CommutativeRing[C <: TMonoidalCategory, M] extends Ring[C, M] {
+  def multiplicative: CommutativeMonoid[C, M]
 }
 
-trait DivisionRing
-  [⟶[_ <: AnyKind, _ <: AnyKind], I <: AnyKind, ⊗ <: AnyKind, M <: AnyKind]
-    extends Ring[⟶, I, ⊗, M] {
-  def multiplicative: Group[⟶, I, ⊗, M]
+trait DivisionRing[C <: TMonoidalCategory, M] extends Ring[C, M] {
+  def multiplicative: Group[C, M]
 
-  def reciprocal: M ⟶ M = multiplicative.inverse
+  def reciprocal: C#Arrow[M, M] = multiplicative.inverse
 }

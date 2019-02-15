@@ -1,11 +1,10 @@
 package cheshire
 
-import scala.{AnyKind}
+import cheshire.category._
 
-trait Field
-  [⟶[_ <: AnyKind, _ <: AnyKind], I <: AnyKind, ⊗ <: AnyKind, M <: AnyKind]
-    extends CommutativeRing[⟶, I, ⊗, M] with DivisionRing[⟶, I, ⊗, M] {
-  def multiplicative: CommutativeGroup[⟶, I, ⊗, M]
+trait Field[C <: TMonoidalCategory, M]
+    extends CommutativeRing[C, M] with DivisionRing[C, M] {
+  def multiplicative: CommutativeGroup[C, M]
 
-  def divide: ⊗ ⟶ M = multiplicative.quotient
+  def divide: C#Arrow[C#Product[M, M], M] = multiplicative.quotient
 }

@@ -1,17 +1,19 @@
 package cheshire
 
-import scala.{Boolean, Function1, Int, Long, None, Option, Predef, Some, Unit}
+import cats.{Id}
+
+import scala.{Boolean, Int, Long, None, Option, Some, Unit}
 
 package object instances {
-  implicit val function1Category: Category[Function1] =
-    new Category[Function1] {
-      def identity[A] = Predef.identity[A](_)
-      def op =
-        new FunctionB[ComposeB[Function1, Function1, ?, ?], Function1] {
-          def apply[A, B](fab: ComposeB[Function1, Function1, A, B]) =
-            fab.f.compose(fab.g)
-        }
-    }
+  // implicit val function1Category: Category[Function1] =
+  //   new Category[Function1] {
+  //     def identity[A] = Predef.identity[A](_)
+  //     def op =
+  //       new FunctionB[ComposeB[Function1, Function1, ?, ?], Function1] {
+  //         def apply[A, B](fab: ComposeB[Function1, Function1, A, B]) =
+  //           fab.f.compose(fab.g)
+  //       }
+  //   }
 
   implicit val booleanRig
       : category.set.Rig[Boolean] =
@@ -66,12 +68,12 @@ package object instances {
   implicit val optionMonad
       : category.set.Monad[Option] =
     new category.set.Monad[Option] {
-      def identity = new FunctionK[Identity, Option] {
-        def apply[A](fa: Identity[A]) = Some(fa.getIdentity)
+      def identity = new FunctionK[Id, Option] {
+        def apply[A](fa: Id[A]) = Some(fa)
       }
-      def op = new FunctionK[Compose[Option, Option, ?], Option] {
-        def apply[A](fa: Compose[Option, Option, A]) =
-          fa.getCompose.fold[Option[A]](None)(_.fold[Option[A]](None)(Some(_)))
+      def op = new FunctionK[cats.data.Nested[Option, Option, ?], Option] {
+        def apply[A](fa: cats.data.Nested[Option, Option, A]) =
+          fa.value.fold[Option[A]](None)(_.fold[Option[A]](None)(Some(_)))
       }
     }
 }

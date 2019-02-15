@@ -1,5 +1,9 @@
 package cheshire
 
+/**
+  * @todo This should be defined as a specialization of `Lan` with better kind-
+  *       polymorphism.
+  */
 final abstract class Day[F[_], G[_], C] {
   type A
   type B

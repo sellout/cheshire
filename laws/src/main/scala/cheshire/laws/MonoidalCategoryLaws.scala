@@ -3,14 +3,14 @@ package cheshire.laws
 import cheshire._
 
 import java.lang.String
-import scala.{AnyKind, Function1, List, Nil, Unit}
+import scala.{AnyKind, List, Nil}
 
 import org.scalacheck._
 import org.scalacheck.Prop.{forAll}
 import org.typelevel.discipline._
 
 final class CartesianSetLaws[A: Arbitrary]
-    extends MonoidalCategoryLaws[Function1, Unit, (A, A), A] {
+    extends MonoidalCategoryLaws[category.Set#Multiplicative, A] {
   def semigroup(implicit A: cheshire.category.set.Semigroup[A]) =
     semigroupSkeleton(List(
       ("associative", forAll { (a: A, b: A, c: A) =>
@@ -63,8 +63,8 @@ final class CartesianSetLaws[A: Arbitrary]
 }
 
 
-trait MonoidalCategoryLaws
-  [⟶[_ <: AnyKind, _ <: AnyKind], I <: AnyKind, ⊗ <: AnyKind,  A <: AnyKind] extends Laws {
+trait MonoidalCategoryLaws[C <: category.TMonoidalCategory,  A <: AnyKind]
+    extends Laws {
 
   def semigroupSkeleton(properties: List[(String, Prop)]) = new RuleSet {
     def name = "semigroup"
@@ -72,31 +72,31 @@ trait MonoidalCategoryLaws
     def bases = Nil
     def props = properties
   }
-  def semigroup(implicit A: Semigroup[⟶, ⊗, A]): RuleSet
+  def semigroup(implicit A: Semigroup[C, A]): RuleSet
 
   def commutativeSemigroupSkeleton
     (properties: List[(String, Prop)])
-    (implicit A: CommutativeSemigroup[⟶, ⊗, A]) =
+    (implicit A: CommutativeSemigroup[C, A]) =
     new RuleSet {
       def name = "commutative semigroup"
       def parents = List(semigroup)
       def bases = Nil
       def props = properties
     }
-  def commutativeSemigroup(implicit A: CommutativeSemigroup[⟶, ⊗, A]): RuleSet
+  def commutativeSemigroup(implicit A: CommutativeSemigroup[C, A]): RuleSet
 
   def monoidSkeleton
     (properties: List[(String, Prop)])
-    (implicit A: Monoid[⟶, I, ⊗, A]) =
+    (implicit A: Monoid[C, A]) =
     new RuleSet {
       def name = "monoid"
       def parents = List(semigroup)
       def bases = Nil
       def props = properties
     }
-  def monoid(implicit A: Monoid[⟶, I, ⊗, A]): RuleSet
+  def monoid(implicit A: Monoid[C, A]): RuleSet
 
-  def commutativeMonoid(implicit A: CommutativeMonoid[⟶, I, ⊗, A]) =
+  def commutativeMonoid(implicit A: CommutativeMonoid[C, A]) =
     new RuleSet {
       def name = "commutative monoid"
       def parents = List(commutativeSemigroup, monoid)
@@ -106,16 +106,16 @@ trait MonoidalCategoryLaws
 
   def groupSkeleton
     (properties: List[(String, Prop)])
-    (implicit A: Group[⟶, I, ⊗, A]) =
+    (implicit A: Group[C, A]) =
     new RuleSet {
       def name = "group"
       def parents = List(monoid)
       def bases = Nil
       def props = properties
     }
-  def group(implicit A: Group[⟶, I, ⊗, A]): RuleSet
+  def group(implicit A: Group[C, A]): RuleSet
 
-  def commutativeGroup(implicit A: CommutativeGroup[⟶, I, ⊗, A]) =
+  def commutativeGroup(implicit A: CommutativeGroup[C, A]) =
     new RuleSet {
       def name = "group"
       def parents = List(commutativeMonoid, group)
@@ -125,7 +125,7 @@ trait MonoidalCategoryLaws
 
   def semiringSkeleton
     (properties: List[(String, Prop)])
-    (implicit A: Semiring[⟶, I, ⊗, A]) =
+    (implicit A: Semiring[C, A]) =
     new RuleSet {
       def name = "semiring"
       def parents = Nil
@@ -134,11 +134,11 @@ trait MonoidalCategoryLaws
         ("multiplicative", monoid(A.multiplicative)))
       def props = properties
     }
-  def semiring(implicit A: Semiring[⟶, I, ⊗, A]): RuleSet
+  def semiring(implicit A: Semiring[C, A]): RuleSet
 
   def rigSkeleton
     (properties: List[(String, Prop)])
-    (implicit A: Rig[⟶, I, ⊗, A]) =
+    (implicit A: Rig[C, A]) =
     new RuleSet {
       def name = "rig"
       def parents = List(semiring)
@@ -147,11 +147,11 @@ trait MonoidalCategoryLaws
         ("multiplicative", monoid(A.multiplicative)))
       def props = properties
     }
-  def rig(implicit A: Rig[⟶, I, ⊗, A]): RuleSet
+  def rig(implicit A: Rig[C, A]): RuleSet
 
   def ringSkeleton
     (properties: List[(String, Prop)])
-    (implicit A: Ring[⟶, I, ⊗, A]) =
+    (implicit A: Ring[C, A]) =
     new RuleSet {
       def name = "ring"
       def parents = List(rig)
@@ -160,11 +160,11 @@ trait MonoidalCategoryLaws
         ("multiplicative", monoid(A.multiplicative)))
       def props = properties
     }
-  def ring(implicit A: Ring[⟶, I, ⊗, A]): RuleSet
+  def ring(implicit A: Ring[C, A]): RuleSet
 
   def commutativeRingSkeleton
     (properties: List[(String, Prop)])
-    (implicit A: CommutativeRing[⟶, I, ⊗, A]) =
+    (implicit A: CommutativeRing[C, A]) =
     new RuleSet {
       def name = "commutativeRing"
       def parents = List(ring)
@@ -173,11 +173,11 @@ trait MonoidalCategoryLaws
         ("multiplicative", commutativeMonoid(A.multiplicative)))
       def props = properties
     }
-  def commutativeRing(implicit A: CommutativeRing[⟶, I, ⊗, A]): RuleSet
+  def commutativeRing(implicit A: CommutativeRing[C, A]): RuleSet
 
   def divisionRingSkeleton
     (properties: List[(String, Prop)])
-    (implicit A: DivisionRing[⟶, I, ⊗, A]) =
+    (implicit A: DivisionRing[C, A]) =
     new RuleSet {
       def name = "divisionRing"
       def parents = List(ring)
@@ -186,5 +186,5 @@ trait MonoidalCategoryLaws
         ("multiplicative", group(A.multiplicative)))
       def props = properties
     }
-  def divisionRing(implicit A: DivisionRing[⟶, I, ⊗, A]): RuleSet
+  def divisionRing(implicit A: DivisionRing[C, A]): RuleSet
 }

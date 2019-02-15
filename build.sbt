@@ -7,9 +7,12 @@ lazy val core = (project in file("core"))
     scalacOptions ++= Seq(
       "-Ykind-polymorphism",
       "-Yno-imports"),
+    libraryDependencies := Seq(
+      "org.typelevel" %% "cats-core"   % "1.3.1"),
     addCompilerPlugin(
       "org.spire-math" %% "kind-projector" % "0.9.8"),
-    wartremoverErrors ++= Warts.allBut(Wart.Any, Wart.Nothing))
+  //  wartremoverErrors ++= Warts.allBut(Wart.Any, Wart.Nothing)
+  )
 
 lazy val laws = (project in file("laws"))
   .dependsOn(core)
