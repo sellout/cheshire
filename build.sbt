@@ -8,10 +8,10 @@ lazy val core = (project in file("core"))
       "-Ykind-polymorphism",
       "-Yno-imports"),
     libraryDependencies := Seq(
-      "org.typelevel" %% "cats-core"   % "1.3.1"),
-    addCompilerPlugin(
-      "org.spire-math" %% "kind-projector" % "0.9.8"),
-  //  wartremoverErrors ++= Warts.allBut(Wart.Any, Wart.Nothing)
+      "org.typelevel" %% "cats-core"   % "1.5.0"),
+    addCompilerPlugin("org.spire-math"  %% "kind-projector" % "0.9.8"),
+    addCompilerPlugin("org.wartremover" %% "wartremover"    % "2.4.1"),
+    wartremoverErrors ++= Warts.allBut(Wart.Any, Wart.Nothing)
   )
 
 lazy val laws = (project in file("laws"))
@@ -25,9 +25,9 @@ lazy val laws = (project in file("laws"))
     libraryDependencies := Seq(
       "org.typelevel"  %% "discipline" % "0.10.0",
       "org.scalacheck" %% "scalacheck" % "1.14.0"),
-    addCompilerPlugin(
-      "org.spire-math" %% "kind-projector" % "0.9.8"),
-    // wartremoverErrors ++= Warts.allBut(Wart.Any, Wart.Nothing)
+    addCompilerPlugin("org.spire-math"  %% "kind-projector" % "0.9.8"),
+    addCompilerPlugin("org.wartremover" %% "wartremover"    % "2.4.1"),
+    wartremoverErrors ++= Warts.allBut(Wart.Any, Wart.Nothing)
   )
 
 /** A library to make it easier to use this library in concert with Cats.
@@ -41,11 +41,11 @@ lazy val cats = (project in file("cats"))
       "-Ykind-polymorphism",
       "-Yno-imports"),
     libraryDependencies := Seq(
-      "org.typelevel" %% "cats-core"   % "1.3.1",
-      "org.typelevel" %% "cats-effect" % "1.0.0"),
-    addCompilerPlugin(
-      "org.spire-math" %% "kind-projector" % "0.9.8"),
-    // wartremoverErrors ++= Warts.allBut(Wart.Any, Wart.Nothing)
+      "org.typelevel" %% "cats-core"   % "1.5.0",
+      "org.typelevel" %% "cats-effect" % "1.2.0"),
+    addCompilerPlugin("org.spire-math"  %% "kind-projector" % "0.9.8"),
+    addCompilerPlugin("org.wartremover" %% "wartremover"    % "2.4.1"),
+    wartremoverErrors ++= Warts.allBut(Wart.Any, Wart.Nothing)
   )
 
 lazy val tests = (project in file("tests"))
@@ -59,5 +59,6 @@ lazy val tests = (project in file("tests"))
     libraryDependencies := Seq(
       "org.typelevel" %% "discipline" % "0.10.0" % "test",
       "org.scalatest" %% "scalatest"  % "3.0.5"  % "test"),
-    // wartremoverErrors ++= Warts.allBut(Wart.Any, Wart.Nothing)
+    addCompilerPlugin("org.wartremover" %% "wartremover"    % "2.4.1"),
+    wartremoverErrors ++= Warts.allBut(Wart.Any, Wart.Nothing)
   )

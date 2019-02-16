@@ -66,17 +66,19 @@ final class CartesianSetLaws[A: Arbitrary]
 trait MonoidalCategoryLaws[C <: category.TMonoidalCategory,  A <: AnyKind]
     extends Laws {
 
-  def semigroupSkeleton(properties: List[(String, Prop)]) = new RuleSet {
-    def name = "semigroup"
-    def parents = Nil
-    def bases = Nil
-    def props = properties
-  }
+  def semigroupSkeleton(properties: List[(String, Prop)]): RuleSet =
+    new RuleSet {
+      def name = "semigroup"
+      def parents = Nil
+      def bases = Nil
+      def props = properties
+    }
   def semigroup(implicit A: Semigroup[C, A]): RuleSet
 
   def commutativeSemigroupSkeleton
     (properties: List[(String, Prop)])
-    (implicit A: CommutativeSemigroup[C, A]) =
+    (implicit A: CommutativeSemigroup[C, A])
+      : RuleSet =
     new RuleSet {
       def name = "commutative semigroup"
       def parents = List(semigroup)
@@ -87,7 +89,8 @@ trait MonoidalCategoryLaws[C <: category.TMonoidalCategory,  A <: AnyKind]
 
   def monoidSkeleton
     (properties: List[(String, Prop)])
-    (implicit A: Monoid[C, A]) =
+    (implicit A: Monoid[C, A])
+      : RuleSet =
     new RuleSet {
       def name = "monoid"
       def parents = List(semigroup)
@@ -96,7 +99,7 @@ trait MonoidalCategoryLaws[C <: category.TMonoidalCategory,  A <: AnyKind]
     }
   def monoid(implicit A: Monoid[C, A]): RuleSet
 
-  def commutativeMonoid(implicit A: CommutativeMonoid[C, A]) =
+  def commutativeMonoid(implicit A: CommutativeMonoid[C, A]): RuleSet =
     new RuleSet {
       def name = "commutative monoid"
       def parents = List(commutativeSemigroup, monoid)
@@ -106,7 +109,8 @@ trait MonoidalCategoryLaws[C <: category.TMonoidalCategory,  A <: AnyKind]
 
   def groupSkeleton
     (properties: List[(String, Prop)])
-    (implicit A: Group[C, A]) =
+    (implicit A: Group[C, A])
+      : RuleSet =
     new RuleSet {
       def name = "group"
       def parents = List(monoid)
@@ -115,7 +119,7 @@ trait MonoidalCategoryLaws[C <: category.TMonoidalCategory,  A <: AnyKind]
     }
   def group(implicit A: Group[C, A]): RuleSet
 
-  def commutativeGroup(implicit A: CommutativeGroup[C, A]) =
+  def commutativeGroup(implicit A: CommutativeGroup[C, A]): RuleSet =
     new RuleSet {
       def name = "group"
       def parents = List(commutativeMonoid, group)
@@ -125,7 +129,8 @@ trait MonoidalCategoryLaws[C <: category.TMonoidalCategory,  A <: AnyKind]
 
   def semiringSkeleton
     (properties: List[(String, Prop)])
-    (implicit A: Semiring[C, A]) =
+    (implicit A: Semiring[C, A])
+      : RuleSet =
     new RuleSet {
       def name = "semiring"
       def parents = Nil
@@ -138,7 +143,8 @@ trait MonoidalCategoryLaws[C <: category.TMonoidalCategory,  A <: AnyKind]
 
   def rigSkeleton
     (properties: List[(String, Prop)])
-    (implicit A: Rig[C, A]) =
+    (implicit A: Rig[C, A])
+      : RuleSet =
     new RuleSet {
       def name = "rig"
       def parents = List(semiring)
@@ -151,7 +157,8 @@ trait MonoidalCategoryLaws[C <: category.TMonoidalCategory,  A <: AnyKind]
 
   def ringSkeleton
     (properties: List[(String, Prop)])
-    (implicit A: Ring[C, A]) =
+    (implicit A: Ring[C, A])
+      : RuleSet =
     new RuleSet {
       def name = "ring"
       def parents = List(rig)
@@ -164,7 +171,8 @@ trait MonoidalCategoryLaws[C <: category.TMonoidalCategory,  A <: AnyKind]
 
   def commutativeRingSkeleton
     (properties: List[(String, Prop)])
-    (implicit A: CommutativeRing[C, A]) =
+    (implicit A: CommutativeRing[C, A])
+      : RuleSet =
     new RuleSet {
       def name = "commutativeRing"
       def parents = List(ring)
@@ -177,7 +185,8 @@ trait MonoidalCategoryLaws[C <: category.TMonoidalCategory,  A <: AnyKind]
 
   def divisionRingSkeleton
     (properties: List[(String, Prop)])
-    (implicit A: DivisionRing[C, A]) =
+    (implicit A: DivisionRing[C, A])
+      : RuleSet =
     new RuleSet {
       def name = "divisionRing"
       def parents = List(ring)
