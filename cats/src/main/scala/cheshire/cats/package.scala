@@ -1,15 +1,14 @@
 package cheshire
 
 import scala.{Function1, Tuple2}
-import _root_.cats.syntax.compose._
 
 import _root_.cats.{
   Applicative => CApplicative,
   Functor => CFunctor,
-  Traverse => CTraverse
-}
+  Traverse => CTraverse }
 
 import _root_.cats.arrow.{Arrow => CArrow}
+import _root_.cats.syntax.compose._
 import _root_.cats.Id
 
 /** This package tries to make it easy to use existing Cats data types and type
