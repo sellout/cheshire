@@ -7,75 +7,58 @@ import scala.{Function1, Unit}
 
 import cheshire._
 
-trait TMonoidalCategory extends cheshire.TCategory with cheshire.TMonoid {
+trait TMonoidalCategory[⟶[_, _]]
+    extends cheshire.Category[⟶] with cheshire.TMonoid {
   def associate[A, B, C]
-      : Arrow[Product[Product[A, B], C], Product[A, Product[B, C]]]
+      : Product[Product[A, B], C] ⟶ Product[A, Product[B, C]]
 
-  def leftUnit[A]: Arrow[Product[Identity, A], A]
+  def leftUnit[A]: Product[Identity, A] ⟶ A
 
-  def rightUnit[A]: Arrow[Product[A, Identity], A]
+  def rightUnit[A]: Product[A, Identity] ⟶ A
 }
 
 trait TMonoidalCategoryF extends cheshire.TCategoryF with cheshire.TMonoidF
 trait TMonoidalCategoryB extends cheshire.TCategoryB with cheshire.TMonoidB
 
-trait TBraidedMonoidalCategory extends TMonoidalCategory {
-  def braid[A, B]: Arrow[Product[A, B], Product[B, A]]
+trait TBraidedMonoidalCategory[⟶[_, _]]
+    extends TMonoidalCategory[⟶] with cheshire.TCommutativeMonoid {
+  def braid[A, B]: Product[A, B] ⟶ Product[B, A]
 }
 
-trait TSymmetricMonoidalCategory extends TBraidedMonoidalCategory
+trait TSymmetricMonoidalCategory[⟶[_, _]] extends TBraidedMonoidalCategory[⟶]
 
-trait TRigCategory extends cheshire.TCategory with cheshire.TRig { outer =>
-  def braid[A, B]: Arrow[Add[A, B], Add[B, A]]
+trait TRigCategory[⟶[_, _]] extends cheshire.Category[⟶] with cheshire.TRig {
+  def additive: TSymmetricMonoidalCategory[⟶]
+
+  def multiplicative: TMonoidalCategory[⟶]
 
   def leftDistribute[A, B, C]
-      : Arrow[Multiply[A, Add[B, C]], Add[Multiply[A, B], Multiply[A, C]]]
+      : Multiply[A, Add[B, C]] ⟶ Add[Multiply[A, B], Multiply[A, C]]
 
   def rightDistribute[A, B, C]
-      : Arrow[Multiply[Add[A, B], C], Add[Multiply[A, C], Multiply[B, C]]]
+      : Multiply[Add[A, B], C] ⟶ Add[Multiply[A, C], Multiply[B, C]]
 
-  def leftAnnihilate[A]: Arrow[Multiply[A, Zero], Zero]
+  def leftAnnihilate[A]: Multiply[A, Zero] ⟶ Zero
 
-  def rightAnnihilate[A]: Arrow[Multiply[Zero, A], Zero]
-
-  abstract class Additive extends TSymmetricMonoidalCategory {
-    type Arrow[A, B] = outer.Arrow[A, B]
-    type Product[A, B] = Add[A, B]
-    type Identity = Zero
-
-    def braid[A,B] = outer.braid[A, B]
-  }
-
-  abstract class Multiplicative extends TMonoidalCategory {
-    type Arrow[A, B] = outer.Arrow[A, B]
-    type Product[A, B] = Multiply[A, B]
-    type Identity = One
-  }
+  def rightAnnihilate[A]: Multiply[Zero, A] ⟶ Zero
 }
 
-trait TDuoidalCategory extends cheshire.TCategory with cheshire.TRig { outer =>
-  abstract class Additive extends TMonoidalCategory {
-    type Arrow[A, B] = outer.Arrow[A, B]
-    type Product[A, B] = Add[A, B]
-    type Identity = Zero
-  }
+trait TDuoidalCategory[⟶[_, _]] extends cheshire.Category[⟶] with cheshire.TDuoid {
+  def additive: TMonoidalCategory[⟶]
+  def multiplicative: TMonoidalCategory[⟶]
 
-  abstract class Multiplicative extends TMonoidalCategory {
-    type Arrow[A, B] = outer.Arrow[A, B]
-    type Product[A, B] = Multiply[A, B]
-    type Identity = One
-  }
+  def redistribute[A, B, C, D]
+      : Add[Multiply[A, B], Multiply[C, D]] ⟶ Multiply[Add[A, C], Add[B, D]]
+  def semisplit: Zero ⟶ Multiply[Zero, Zero]
+  def semijoin: Add[One, One] ⟶ One
+  /** TODO: This one should be able to have a default definition. */
+  def reident: Zero ⟶ One
 }
 
+/** TODO: The laws for duoids have terrible names here. Hopefully someone has
+          given them better names somewhere?
+  */
 trait TDuoidalCategoryF extends cheshire.TCategoryF with cheshire.TRigF { outer =>
-  def redistribute[A[_], B[_], C[_], D[_]]
-      : Arrow[Add[Multiply[A, B, ?], Multiply[C, D, ?], ?],
-              Multiply[Add[A, C, ?], Add[B, D, ?], ?]]
-  def semisplit: Arrow[Zero, Multiply[Zero, Zero, ?]]
-  def semijoin: Arrow[Add[One, One, ?], One]
-  /** This one should be able to have a default definition. */
-  def reident: Arrow[Zero, One]
-
   class Additive extends TMonoidalCategoryF {
     type Arrow[A[_], B[_]] = outer.Arrow[A, B]
     type Product[A[_], B[_], I] = Add[A, B, I]
@@ -87,6 +70,14 @@ trait TDuoidalCategoryF extends cheshire.TCategoryF with cheshire.TRigF { outer 
     type Product[A[_], B[_], I] = Multiply[A, B, I]
     type Identity[A] = One[A]
   }
+
+  def redistribute[A[_], B[_], C[_], D[_]]
+      : Arrow[Add[Multiply[A, B, ?], Multiply[C, D, ?], ?],
+              Multiply[Add[A, C, ?], Add[B, D, ?], ?]]
+  def semisplit: Arrow[Zero, Multiply[Zero, Zero, ?]]
+  def semijoin: Arrow[Add[One, One, ?], One]
+  /** TODO: This one should be able to have a default definition. */
+  def reident: Arrow[Zero, One]
 }
 
 final class EndofunctorCategory extends TDuoidalCategoryF {
@@ -135,26 +126,27 @@ final class EndofunctorCategory extends TDuoidalCategoryF {
   *
   * @todo Generalize with better kind-polymorphism.
   */
-trait MonoidalCategory[C <: TMonoidalCategory] {
-  type Monoid[M] = cheshire.Monoid[C, M]
-  type CommutativeMonoid[M] =
-    cheshire.CommutativeMonoid[C, M]
+trait MonoidalCategory[⟶[_, _]] {
+  def cat: TMonoidalCategory[⟶]
 
-  type Group[G] = cheshire.Group[C, G]
-  type CommutativeGroup[G] = cheshire.CommutativeGroup[C, G]
+  type Monoid[M] = cheshire.Monoid[⟶, M]
+  type CommutativeMonoid[M] = cheshire.CommutativeMonoid[⟶, M]
 
-  type Semigroup[G] = cheshire.Semigroup[C, G]
-  type CommutativeSemigroup[G] = cheshire.CommutativeSemigroup[C, G]
+  type Group[G] = cheshire.Group[⟶, G]
+  type CommutativeGroup[G] = cheshire.CommutativeGroup[⟶, G]
 
-  type Semiring[G] = cheshire.Semiring[C, G]
+  type Semigroup[G] = cheshire.Semigroup[⟶, G]
+  type CommutativeSemigroup[G] = cheshire.CommutativeSemigroup[⟶, G]
 
-  type Rig[G] = cheshire.Rig[C, G]
+  type Semiring[G] = cheshire.Semiring[⟶, G]
 
-  type Ring[G] = cheshire.Ring[C, G]
-  type CommutativeRing[G] = cheshire.CommutativeRing[C, G]
-  type DivisionRing[G] = cheshire.DivisionRing[C, G]
+  type Rig[G] = cheshire.Rig[⟶, G]
 
-  type Field[G] = cheshire.Field[C, G]
+  type Ring[G] = cheshire.Ring[⟶, G]
+  type CommutativeRing[G] = cheshire.CommutativeRing[⟶, G]
+  type DivisionRing[G] = cheshire.DivisionRing[⟶, G]
+
+  type Field[G] = cheshire.Field[⟶, G]
 }
 
 // trait MonoidalBicategory[⟶[_, _], I <: AnyKind, ⊗[_, _], ⟹[_[_], _[_]]] {

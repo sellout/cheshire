@@ -12,14 +12,16 @@ trait FunctionB[F[_ <: AnyKind, _ <: AnyKind], G[_ <: AnyKind, _ <: AnyKind]] {
   def apply[A <: AnyKind, B <: AnyKind](fab: F[A, B]): G[A, B]
 }
 
+trait ProProduct[F[_, _], G[_, _], A, B] {
+  type Z
+
+  def f: F[Z, B]
+  def g: G[A, Z]
+}
+
 final class ProfunctorCategory extends TMonoidalCategoryB {
   type Arrow[F[_, _], G[_, _]] = FunctionB[F, G]
-  type Product[F[_, _], G[_, _], A, B] = {
-    type Z
-
-    def f: F[Z, B]
-    def g: G[A, Z]
-  }
+  type Product[F[_, _], G[_, _], A, B] = ProProduct[F, G, A, B]
   type Unit[A, B] = scala.Function1[A, B]
 }
 

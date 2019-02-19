@@ -1,14 +1,9 @@
 package cheshire
 
-import cheshire.category._
-
 trait TRig extends TSemiring {
-  type Zero
+  type Zero = additive.Identity
 
-  class Additive extends TMonoid {
-    type Product[A, B] = Add[A, B]
-    type Identity = Zero
-  }
+  def additive: TCommutativeMonoid
 }
 
 trait TRigF extends TSemiringF {
@@ -20,13 +15,13 @@ trait TRigF extends TSemiringF {
   }
 }
 
-trait Rig[C <: TMonoidalCategory, M] extends Semiring[C, M] {
-  def additive: CommutativeMonoid[C, M]
+trait Rig[⟶[_, _], M] extends Semiring[⟶, M] {
+  def additive: CommutativeMonoid[⟶, M]
 
-  def zero: C#Arrow[C#Identity, M] = additive.identity
+  def zero: cat.Identity ⟶ M = additive.identity
 }
 
-trait IdempotentRig[C <: TMonoidalCategory, M]
-    extends Rig[C, M] with IdempotentSemiring[C, M] {
-  def additive: IdempotentCommutativeMonoid[C, M]
+trait IdempotentRig[⟶[_, _], M]
+    extends Rig[⟶, M] with IdempotentSemiring[⟶, M] {
+  def additive: IdempotentCommutativeMonoid[⟶, M]
 }

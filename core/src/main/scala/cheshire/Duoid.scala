@@ -1,14 +1,14 @@
 package cheshire
 
-import cheshire.category._
+trait TDuoid {
+  type Add[A, B] = additive.Product[A, B]
+  type Zero = additive.Identity
+  type Multiply[A, B] = multiplicative.Product[A, B]
+  type One = multiplicative.Identity
 
-trait TDuoid extends TIdempotentSemiring {
-  type Zero
+  def additive: TMonoid
 
-  class Additive extends TBoundedSemilattice {
-    type Product[A, B] = Add[A, B]
-    type Identity = Zero
-  }
+  def multiplicative: TMonoid
 }
 
 trait TDuoidF extends TIdempotentSemiringF {
@@ -20,6 +20,6 @@ trait TDuoidF extends TIdempotentSemiringF {
   }
 }
 
-trait Duoid[C <: TMonoidalCategory, M] extends IdempotentSemiring[C, M] {
-  def additive: BoundedSemilattice[C, M]
+trait Duoid[⟶[_, _], M] extends IdempotentSemiring[⟶, M] {
+  def additive: BoundedSemilattice[⟶, M]
 }
