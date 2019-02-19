@@ -36,6 +36,6 @@ package object cats {
         fab.f <<< fab.g
     }
 
-    override def map[A, B](fn: A => B): A ==> B = CArrow[==>].lift(fn)
+    override def map[A, B](fn: A => B): A ==> B = A.lift(fn)
   }
 }
