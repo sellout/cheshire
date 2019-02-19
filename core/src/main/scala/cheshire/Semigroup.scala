@@ -28,7 +28,7 @@ trait SemigroupF[C <: TMonoidalCategoryF, M[_]] {
   def op: C#Arrow[C#Product[M, M, ?], M]
 }
 
-/** A semigroup in the category of Hom functors.
+/** A semigroup in the category of bifunctors.
   *
   * @todo Remove and use `Semigroup` directly.
   */
