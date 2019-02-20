@@ -2,7 +2,7 @@ package cheshire.category
 
 import scala.{Either, Function1, Left, Nothing, Right, Unit}
 
-import cheshire.{FunctionB, ProProduct}
+import cheshire.{FunctionB, Iso, ProProduct}
 
 package object meh {
   def Set: TRigCategory[Function1] = new TRigCategory[Function1] { outer =>
@@ -20,20 +20,34 @@ package object meh {
       def op = outer.op
       def identity[A] = outer.identity[A]
 
-      def associate[A, B, C] = {
-        case Left(Left(a)) => Left(a)
-        case Left(Right(b)) => Right(Left(b))
-        case Right(c) => Right(Right(c))
+      def associate[A, B, C] =
+        new Iso[Function1, Either[Either[A, B], C], Either[A, Either[B, C]]] {
+        def apply = {
+          case Left(Left(a)) => Left(a)
+          case Left(Right(b)) => Right(Left(b))
+          case Right(c) => Right(Right(c))
+        }
+        def unapply = {
+          case Left(a) => Left(Left(a))
+          case Right(Left(b)) => Left(Right(b))
+          case Right(Right(c)) => Right(c)
+        }
       }
-      def leftUnit[A] = {
-        // FIXME: This should be using the cocartesian identity op.
-        case Left(_) => scala.Predef.???
-        case Right(a) => a
+      def leftUnit[A] = new Iso[Function1, Either[Nothing, A], A] {
+        def apply = {
+          // FIXME: This should be using the cocartesian identity op.
+          case Left(_) => scala.Predef.???
+          case Right(a) => a
+        }
+        def unapply = Right(_)
       }
-      def rightUnit[A] = {
-        case Left(a) => a
-        // FIXME: This should be using the cocartesian identity op.
-        case Right(_) => scala.Predef.???
+      def rightUnit[A] = new Iso[Function1, Either[A, Nothing], A] {
+        def apply = {
+          case Left(a) => a
+          // FIXME: This should be using the cocartesian identity op.
+          case Right(_) => scala.Predef.???
+        }
+        def unapply = Left(_)
       }
       def braid[A, B] = {
         case Left(a) => Right(a)
@@ -49,9 +63,18 @@ package object meh {
       def op = outer.op
       def identity[A] = outer.identity[A]
 
-      def associate[A, B, C] = x => (x._1._1, (x._1._2, x._2))
-      def leftUnit[A] = _._2
-      def rightUnit[A] = _._1
+      def associate[A, B, C] = new Iso[Function1, ((A, B), C), (A, (B, C))] {
+        def apply = x => (x._1._1, (x._1._2, x._2))
+        def unapply = x => ((x._1, x._2._1), x._2._2)
+      }
+      def leftUnit[A] = new Iso[Function1, (Unit, A), A] {
+        def apply = _._2
+        def unapply = ((), _)
+      }
+      def rightUnit[A] = new Iso[Function1, (A, Unit), A] {
+        def apply = _._1
+        def unapply = (_, ())
+      }
       def braid[A, B] = {
         case (a, b) => (b, a)
       }

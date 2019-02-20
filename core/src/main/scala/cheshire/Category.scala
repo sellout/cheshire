@@ -12,6 +12,9 @@ trait FunctionB[F[_ <: AnyKind, _ <: AnyKind], G[_ <: AnyKind, _ <: AnyKind]] {
   def apply[A <: AnyKind, B <: AnyKind](fab: F[A, B]): G[A, B]
 }
 
+/** This is a terrible name for the monoidal product in the category of
+  * profunctors.
+  */
 trait ProProduct[F[_, _], G[_, _], A, B] {
   type Z
 

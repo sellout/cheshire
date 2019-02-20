@@ -10,11 +10,11 @@ import cheshire._
 trait TMonoidalCategory[⟶[_, _]]
     extends cheshire.Category[⟶] with cheshire.TMonoid {
   def associate[A, B, C]
-      : Product[Product[A, B], C] ⟶ Product[A, Product[B, C]]
+      : Iso[⟶, Product[Product[A, B], C], Product[A, Product[B, C]]]
 
-  def leftUnit[A]: Product[Identity, A] ⟶ A
+  def leftUnit[A]: Iso[⟶, Product[Identity, A], A]
 
-  def rightUnit[A]: Product[A, Identity] ⟶ A
+  def rightUnit[A]: Iso[⟶, Product[A, Identity], A]
 }
 
 trait TMonoidalCategoryF extends cheshire.TCategoryF with cheshire.TMonoidF
@@ -33,14 +33,14 @@ trait TRigCategory[⟶[_, _]] extends cheshire.Category[⟶] with cheshire.TRig 
   def multiplicative: TMonoidalCategory[⟶]
 
   def leftDistribute[A, B, C]
-      : Multiply[A, Add[B, C]] ⟶ Add[Multiply[A, B], Multiply[A, C]]
+      : Iso[⟶, Multiply[A, Add[B, C]], Add[Multiply[A, B], Multiply[A, C]]]
 
   def rightDistribute[A, B, C]
-      : Multiply[Add[A, B], C] ⟶ Add[Multiply[A, C], Multiply[B, C]]
+      : Iso[⟶, Multiply[Add[A, B], C], Add[Multiply[A, C], Multiply[B, C]]]
 
-  def leftAnnihilate[A]: Multiply[A, Zero] ⟶ Zero
+  def leftAnnihilate[A]: Iso[⟶, Multiply[A, Zero], Zero]
 
-  def rightAnnihilate[A]: Multiply[Zero, A] ⟶ Zero
+  def rightAnnihilate[A]: Iso[⟶, Multiply[Zero, A], Zero]
 }
 
 trait TDuoidalCategory[⟶[_, _]] extends cheshire.Category[⟶] with cheshire.TDuoid {
@@ -126,27 +126,54 @@ final class EndofunctorCategory extends TDuoidalCategoryF {
   *
   * @todo Generalize with better kind-polymorphism.
   */
-trait MonoidalCategory[⟶[_, _]] {
+trait MonoidalCategory[⟶[_, _]] { outer =>
   def cat: TMonoidalCategory[⟶]
 
-  type Monoid[M] = cheshire.Monoid[⟶, M]
-  type CommutativeMonoid[M] = cheshire.CommutativeMonoid[⟶, M]
+  trait ≅[A, B] extends cheshire.Iso[⟶, A, B]
+  trait ≣[A, B] extends cheshire.Leibniz[⟶, A, B]
 
-  type Group[G] = cheshire.Group[⟶, G]
-  type CommutativeGroup[G] = cheshire.CommutativeGroup[⟶, G]
+  trait Monoid[M] extends cheshire.Monoid[⟶, M] {
+    def cat = outer.cat
+  }
+  trait CommutativeMonoid[M] extends cheshire.CommutativeMonoid[⟶, M] {
+    def cat = outer.cat
+  }
 
-  type Semigroup[G] = cheshire.Semigroup[⟶, G]
-  type CommutativeSemigroup[G] = cheshire.CommutativeSemigroup[⟶, G]
+  trait Group[G] extends cheshire.Group[⟶, G] {
+    def cat = outer.cat
+  }
+  trait CommutativeGroup[G] extends cheshire.CommutativeGroup[⟶, G] {
+    def cat = outer.cat
+  }
 
-  type Semiring[G] = cheshire.Semiring[⟶, G]
+  trait Semigroup[G] extends cheshire.Semigroup[⟶, G] {
+    def cat = outer.cat
+  }
+  trait CommutativeSemigroup[G] extends cheshire.CommutativeSemigroup[⟶, G] {
+    def cat = outer.cat
+  }
 
-  type Rig[G] = cheshire.Rig[⟶, G]
+  trait Semiring[G] extends cheshire.Semiring[⟶, G] {
+    def cat = outer.cat
+  }
 
-  type Ring[G] = cheshire.Ring[⟶, G]
-  type CommutativeRing[G] = cheshire.CommutativeRing[⟶, G]
-  type DivisionRing[G] = cheshire.DivisionRing[⟶, G]
+  trait Rig[G] extends cheshire.Rig[⟶, G] {
+    def cat = outer.cat
+  }
 
-  type Field[G] = cheshire.Field[⟶, G]
+  trait Ring[G] extends cheshire.Ring[⟶, G] {
+    def cat = outer.cat
+  }
+  trait CommutativeRing[G] extends cheshire.CommutativeRing[⟶, G] {
+    def cat = outer.cat
+  }
+  trait DivisionRing[G] extends cheshire.DivisionRing[⟶, G] {
+    def cat = outer.cat
+  }
+
+  trait Field[G] extends cheshire.Field[⟶, G] {
+    def cat = outer.cat
+  }
 }
 
 // trait MonoidalBicategory[⟶[_, _], I <: AnyKind, ⊗[_, _], ⟹[_[_], _[_]]] {
