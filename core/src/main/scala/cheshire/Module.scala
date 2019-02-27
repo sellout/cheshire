@@ -1,23 +1,21 @@
 package cheshire
 
-import cheshire.category._
-
-trait LeftModule[C <: TMonoidalCategory, R, M]
-    extends Ring[C, R] with CommutativeGroup[C, M] {
-  def leftMultiply: C#Arrow[C#Product[R, M], M]
+trait LeftModule[⟶[_, _], R, M]
+    extends Ring[⟶, R] with CommutativeGroup[⟶, M] {
+  def leftMultiply: cat.Product[R, M] ⟶ M
 }
 
-trait RightModule[C <: TMonoidalCategory, R, M]
-    extends Ring[C, R] with CommutativeGroup[C, M] {
-  def rightMultiply: C#Arrow[C#Product[M, R], M]
+trait RightModule[⟶[_, _], R, M]
+    extends Ring[⟶, R] with CommutativeGroup[⟶, M] {
+  def rightMultiply: cat.Product[M, R] ⟶ M
 }
 
-trait Module[C <: TMonoidalCategory, R, M]
-    extends LeftModule[C, R, M]
-    with RightModule[C, R, M]
-    with CommutativeRing[C, R] {
+trait Module[⟶[_, _], R, M]
+    extends LeftModule[⟶, R, M]
+    with RightModule[⟶, R, M]
+    with CommutativeRing[⟶, R] {
 }
 
-trait VectorSpace[C <: TMonoidalCategory, R, M]
-    extends Module[C, R, M] with Field[C, R] {
+trait VectorSpace[⟶[_, _], R, M]
+    extends Module[⟶, R, M] with Field[⟶, R] {
 }

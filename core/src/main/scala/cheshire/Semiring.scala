@@ -3,18 +3,13 @@ package cheshire
 import cheshire.category._
 
 trait TSemiring {
-  type Add[_, _]
-  type Multiply[_, _]
-  type One
+  type Add[A, B] = additive.Product[A, B]
+  type Multiply[A, B] = multiplicative.Product[A, B]
+  type One = multiplicative.Identity
 
-  class Additive extends TCommutativeSemigroup {
-    type Product[A, B] = Add[A, B]
-  }
+  def additive: TCommutativeSemigroup
 
-  class Multiplicative extends TMonoid {
-    type Product[A, B] = Multiply[A, B]
-    type Identity = One
-  }
+  def multiplicative: TMonoid
 }
 
 trait TSemiringF {
@@ -44,15 +39,17 @@ trait TIdempotentSemiringF extends TSemiringF {
   }
 }
 
-trait Semiring[C <: TMonoidalCategory, M] {
-  def additive: CommutativeSemigroup[C, M]
-  def multiplicative: Monoid[C, M]
+trait Semiring[⟶[_, _], M] {
+  def cat: TMonoidalCategory[⟶]
 
-  def add: C#Arrow[C#Product[M, M], M] = additive.op
-  def multiply: C#Arrow[C#Product[M, M], M] = multiplicative.op
-  def one: C#Arrow[C#Identity, M] = multiplicative.identity
+  def additive: CommutativeSemigroup[⟶, M]
+  def multiplicative: Monoid[⟶, M]
+
+  def add: cat.Product[M, M] ⟶ M = additive.op
+  def multiply: cat.Product[M, M] ⟶ M = multiplicative.op
+  def one: cat.Identity ⟶ M = multiplicative.identity
 }
 
-trait IdempotentSemiring[C <: TMonoidalCategory, M] extends Semiring[C, M] {
-  def additive: Semilattice[C, M]
+trait IdempotentSemiring[⟶[_, _], M] extends Semiring[⟶, M] {
+  def additive: Semilattice[⟶, M]
 }

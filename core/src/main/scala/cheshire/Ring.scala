@@ -1,21 +1,19 @@
 package cheshire
 
-import cheshire.category._
+trait Ring[⟶[_, _], M] extends Rig[⟶, M] {
+  def additive: CommutativeGroup[⟶, M]
+  def multiplicative: Monoid[⟶, M]
 
-trait Ring[C <: TMonoidalCategory, M] extends Rig[C, M] {
-  def additive: CommutativeGroup[C, M]
-  def multiplicative: Monoid[C, M]
-
-  def negate: C#Arrow[M, M] = additive.inverse
-  def subtract: C#Arrow[C#Product[M, M], M] = additive.quotient
+  def negate: M ⟶ M = additive.inverse
+  def subtract: cat.Product[M, M] ⟶ M = additive.quotient
 }
 
-trait CommutativeRing[C <: TMonoidalCategory, M] extends Ring[C, M] {
-  def multiplicative: CommutativeMonoid[C, M]
+trait CommutativeRing[⟶[_, _], M] extends Ring[⟶, M] {
+  def multiplicative: CommutativeMonoid[⟶, M]
 }
 
-trait DivisionRing[C <: TMonoidalCategory, M] extends Ring[C, M] {
-  def multiplicative: Group[C, M]
+trait DivisionRing[⟶[_, _], M] extends Ring[⟶, M] {
+  def multiplicative: Group[⟶, M]
 
-  def reciprocal: C#Arrow[M, M] = multiplicative.inverse
+  def reciprocal: M ⟶ M = multiplicative.inverse
 }

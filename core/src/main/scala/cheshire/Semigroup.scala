@@ -7,15 +7,17 @@ import cheshire.category._
   * polymorphism isn’t yet powerful enough for `Monoid` itself to ensure the
   * constraint that `⊗` is a bifunctor on `M`.
   */
-trait Semigroup[C <: TMonoidalCategory, M] {
-  def op: C#Arrow[C#Product[M, M], M]
+trait Semigroup[⟶[_, _], M] {
+  def cat: TMonoidalCategory[⟶]
+
+  def op: cat.Product[M, M] ⟶ M
 }
 
-trait CommutativeSemigroup[C <: TMonoidalCategory, M] extends Semigroup[C, M]
+trait CommutativeSemigroup[⟶[_, _], M] extends Semigroup[⟶, M]
 
 /** Also known as a “band”.
   */
-trait IdempotentSemigroup[C <: TMonoidalCategory, M] extends Semigroup[C, M]
+trait IdempotentSemigroup[⟶[_, _], M] extends Semigroup[⟶, M]
 
 /** A semigroup in the category of endofunctors in *Skal*.
   *
